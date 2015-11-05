@@ -38,14 +38,14 @@ def _promote_struct_dtypes(dtype1, dtype2):
 
 class NdarrayStore(object):
     """Chunked store for arbitrary ndarrays, supporting append.
-    
+
     for the simple example:
     dat = np.empty(10)
     library.write('test', dat) #version 1
     library.append('test', dat) #version 2
-    
+
     version documents:
-    
+
     [
      {u'_id': ObjectId('55fa9a7781f12654382e58b8'),
       u'symbol': u'test',
@@ -61,7 +61,7 @@ class NdarrayStore(object):
       u'sha': Binary('.........', 0),
       u'shape': [-1],
       },
-      
+
      {u'_id': ObjectId('55fa9aa981f12654382e58ba'),
       u'symbol': u'test',
       u'version': 2
@@ -76,10 +76,10 @@ class NdarrayStore(object):
       u'segment_count': 2, #2 segments included in this version
       }
       ]
-    
+
 
     segment documents:
-    
+
     [
      #first chunk written:
      {u'_id': ObjectId('55fa9a778b376a68efdd10e3'),
@@ -116,7 +116,7 @@ class NdarrayStore(object):
             collection.create_index([('symbol', pymongo.ASCENDING),
                                      ('parent', pymongo.ASCENDING),
                                      ('segment', pymongo.ASCENDING)], unique=True, background=True)
-        except OperationFailure, e:
+        except OperationFailure as e:
             if "can't use unique indexes" in str(e):
                 return
             raise
@@ -181,8 +181,8 @@ Version document:
 
     def _do_read(self, collection, version, symbol, index_range=None):
         '''
-        index_range is a 2-tuple of integers - a [from, to) range of segments to be read. 
-            Either from or to can be None, indicating no bound. 
+        index_range is a 2-tuple of integers - a [from, to) range of segments to be read.
+            Either from or to can be None, indicating no bound.
         '''
         from_index = index_range[0] if index_range else None
         to_index = version['up_to']
@@ -307,7 +307,7 @@ Version document:
                     '''If we get a duplicate key error here, this segment has the same symbol/parent/segment
                        as another chunk, but a different sha. This means that we have 'forked' history.
                        If we concat_and_rewrite here, new chunks will have a different parent id (the _id of this version doc)
-                       ...so we can safely write them. 
+                       ...so we can safely write them.
                        '''
                     self._concat_and_rewrite(collection, version, symbol, item, previous_version)
                     return
@@ -471,7 +471,7 @@ Version document:
         segments: list of offsets. Each offset is the row index of the
                   the last row of a particular chunk relative to the start of the _original_ item.
                   array(new_data) - segments = array(offsets in item)
-        
+
         Returns:
         --------
         Library specific index metadata to be stored in the version document.

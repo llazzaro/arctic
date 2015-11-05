@@ -54,13 +54,13 @@ class VersionStore(object):
         logger.info("Trying to enable usePowerOf2Sizes...")
         try:
             enable_powerof2sizes(arctic_lib.arctic, arctic_lib.get_name())
-        except OperationFailure, e:
+        except OperationFailure as e:
             logger.error("Library created, but couldn't enable usePowerOf2Sizes: %s" % str(e))
 
         logger.info("Trying to enable sharding...")
         try:
             enable_sharding(arctic_lib.arctic, arctic_lib.get_name(), hashed=hashed)
-        except OperationFailure, e:
+        except OperationFailure as e:
             logger.warn("Library created, but couldn't enable sharding: %s. This is OK if you're not 'admin'" % str(e))
 
     @mongo_retry
@@ -105,7 +105,7 @@ class VersionStore(object):
 
     def __repr__(self):
         return str(self)
-    
+
     def _read_preference(self, allow_secondary):
         """ Return the mongo read preference given an 'allow_secondary' argument
         """
@@ -330,7 +330,7 @@ class VersionStore(object):
                                        date_range=date_range,
                                        read_preference=ReadPreference.PRIMARY,
                                        **kwargs)
-        except Exception, e:
+        except Exception as e:
             log_exception('read', e, 1)
             raise
 
@@ -350,7 +350,7 @@ class VersionStore(object):
             `str` : snapshot name which contains the version
             `datetime.datetime` : the version of the data that existed as_of the requested point in time
         """
-        print self._get_info(symbol, as_of)
+        print(self._get_info(symbol, as_of))
 
     def _get_info(self, symbol, as_of=None):
         _version = self._read_metadata(symbol, as_of=as_of)
@@ -472,7 +472,7 @@ class VersionStore(object):
         next_ver = self._version_nums.find_one({'symbol': symbol, 'version': previous_version['version']})
 
         if next_ver is None:
-            raise ArcticException('''version_nums is out of sync with previous version document. 
+            raise ArcticException('''version_nums is out of sync with previous version document.
             This probably means that either a version document write has previously failed, or the previous version has been deleted.
             Append not possible - please call write() to get versions back in sync''')
 
@@ -538,7 +538,7 @@ class VersionStore(object):
             Default: True
         kwargs :
             passed through to the write handler
-            
+
         Returns
         -------
         VersionedItem named tuple containing the metadata and verison number
@@ -589,7 +589,7 @@ class VersionStore(object):
                                         # At least 'keep_mins' old
                                         '_id': {'$lt': bson.ObjectId.from_datetime(
                                                         dt.utcnow()
-                                                        # Add one second as the ObjectId str has random fuzz 
+                                                        # Add one second as the ObjectId str has random fuzz
                                                         + timedelta(seconds=1)
                                                         - timedelta(minutes=keep_mins))
                                                 }
@@ -718,8 +718,8 @@ class VersionStore(object):
         snapshot = {'_id': bson.ObjectId()}
         snapshot['name'] = snap_name
         snapshot['metadata'] = metadata
-        
-        skip_symbols = set() if skip_symbols is None else set(skip_symbols) 
+
+        skip_symbols = set() if skip_symbols is None else set(skip_symbols)
 
         if versions is None:
             versions = {sym: None for sym in set(self.list_symbols()) - skip_symbols}

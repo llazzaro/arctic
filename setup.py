@@ -65,7 +65,10 @@ class PyTest(TestCommand):
 import sys
 if 'setuptools.extension' in sys.modules:
     m = sys.modules['setuptools.extension']
-    m.Extension.__dict__ = m._Extension.__dict__
+    try:
+        m.Extension.__dict__ = m._Extension.__dict__
+    except AttributeError:
+        pass # python3 should raise AttributeError
 
 # Cython lz4
 compress = Extension('arctic._compress',

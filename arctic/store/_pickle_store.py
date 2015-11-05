@@ -1,8 +1,17 @@
 import bson
 from bson.binary import Binary
 from bson.errors import InvalidDocument
-import cPickle
-import cStringIO as stringio
+
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
+
+try:
+        from StringIO import StringIO as stringio
+except ImportError:
+        from io import StringIO as stringio
+
 import lz4
 import pymongo
 import pprint
